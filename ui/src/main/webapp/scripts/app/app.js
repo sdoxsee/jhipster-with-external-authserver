@@ -5,7 +5,7 @@ angular.module('jhipsterApp', ['LocalStorageModule', 'tmh.dynamicLocale', 'pasca
     // jhipster-needle-angularjs-add-module JHipster will add new module
     'ui.bootstrap', 'ui.router',  'infinite-scroll', 'angular-loading-bar'])
 
-    .run(function ($rootScope, $location, $window, $http, $state, $translate, Language, Auth, Principal, ENV, VERSION) {
+    .run(function ($rootScope, $location, $window, $http, $state, $translate, localStorageService, Language, Auth, Principal, ENV, VERSION) {
         // update the window title using params in the following
         // precendence
         // 1. titleKey parameter
@@ -22,7 +22,7 @@ angular.module('jhipsterApp', ['LocalStorageModule', 'tmh.dynamicLocale', 'pasca
 
         $rootScope.ENV = ENV;
         $rootScope.VERSION = VERSION;
-        $rootScope.$on('$stateChangeStart', function (event, toState, toStateParams) {
+        $rootScope.$on('$stateChangeStart', function (event, toState, toStateParams, fromState, fromParams) {
             $rootScope.toState = toState;
             $rootScope.toStateParams = toStateParams;
 
@@ -49,9 +49,11 @@ angular.module('jhipsterApp', ['LocalStorageModule', 'tmh.dynamicLocale', 'pasca
             // reset the state memory after logout. If we're redirected to login, our
             // previousState is already set in the authExpiredInterceptor. If we're going
             // to login directly, we don't want to be sent to some previous state anyway
-            if (toState.name != 'login' && $rootScope.previousStateName) {
-              $rootScope.previousStateName = fromState.name;
-              $rootScope.previousStateParams = fromParams;
+            if (toState.name != 'login' && localStorageService.get('previousStateName')) {
+              // localStorageService.set('previousStateName',fromState.name);
+              // localStorageService.set('previousStateParams',fromParams);
+              // $rootScope.previousStateName = fromState.name;
+              // $rootScope.previousStateParams = fromParams;
             }
 
             // Set the page title key to the one configured in state or use default one
@@ -67,10 +69,12 @@ angular.module('jhipsterApp', ['LocalStorageModule', 'tmh.dynamicLocale', 'pasca
 
         $rootScope.back = function() {
             // If previous state is 'activate' or do not exist go to 'home'
-            if ($rootScope.previousStateName === 'activate' || $state.get($rootScope.previousStateName) === null) {
+            var previousStateName = localStorageService.get('previousStateName');
+            var previousStateParams = localStorageService.get('previousStateParams');
+            if (previousStateName === 'activate' || $state.get(previousStateName) === null) {
                 $state.go('home');
             } else {
-                $state.go($rootScope.previousStateName, $rootScope.previousStateParams);
+                $state.go(previousStateName, previousStateParams);
             }
         };
     })

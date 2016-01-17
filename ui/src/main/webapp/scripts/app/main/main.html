@@ -12,8 +12,8 @@
                     You are logged in as user "{{account.login}}".
                 </div>
 
-                <div class="alert alert-warning" ng-switch-when="false" translate="global.messages.info.authenticated">
-                    If you want to <a class="alert-link" href="#/login">sign in</a>, you can try the default accounts:<br/>- Administrator (login="admin" and password="admin") <br/>- User (login="user" and password="user").
+                <div class="alert alert-warning" ng-switch-when="false">
+                    If you want to <a ui-sref="login" class="alert-link">sign in</a>, you can try the default accounts:<br/>- Administrator (login="admin" and password="admin") <br/>- User (login="user" and password="user").
                 </div>
 
                 <div class="alert alert-warning" ng-switch-when="false" translate="global.messages.info.register">
