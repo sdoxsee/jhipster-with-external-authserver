@@ -2,6 +2,7 @@ package demo;
 
 import java.security.KeyPair;
 import java.security.Principal;
+import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -14,12 +15,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 import org.springframework.stereotype.Controller;
@@ -34,10 +37,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @SessionAttributes("authorizationRequest")
 @EnableResourceServer
 public class AuthserverApplication extends WebMvcConfigurerAdapter {
-
+	
 	@RequestMapping("/user")
 	@ResponseBody
-	public Principal user(Principal user) {
+	public User user(Principal principal) {
+		User user = new User();
+		user.setLogin(((OAuth2Authentication)principal).getName());
+		user.setLangKey("en"); // hardcoded for now
+		Collection<GrantedAuthority> authorities = ((OAuth2Authentication)principal).getAuthorities();
+		for (GrantedAuthority grantedAuthority : authorities) {
+			user.getAuthorities().add(grantedAuthority.getAuthority());
+		}
 		return user;
 	}
 
