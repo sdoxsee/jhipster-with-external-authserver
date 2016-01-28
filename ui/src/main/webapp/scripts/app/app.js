@@ -26,6 +26,16 @@ angular.module('jhipsterApp', ['LocalStorageModule', 'tmh.dynamicLocale', 'pasca
             $rootScope.toState = toState;
             $rootScope.toStateParams = toStateParams;
 
+            // catch the case where we've just loaded the angular app but there is
+            // a previousStateName in localStorage that we should go to.
+            if (!fromState.name && localStorageService.get('previousStateName')) {
+              event.preventDefault();
+              var previousState = localStorageService.get('previousStateName');
+              localStorageService.set('previousStateName', undefined);
+              localStorageService.set('previousStateParams', undefined);
+              $state.go(previousState);
+            }
+
             if (toState.external) {
               event.preventDefault();
               $window.open(toState.url, '_self');
@@ -44,17 +54,6 @@ angular.module('jhipsterApp', ['LocalStorageModule', 'tmh.dynamicLocale', 'pasca
 
         $rootScope.$on('$stateChangeSuccess',  function(event, toState, toParams, fromState, fromParams) {
             var titleKey = 'global.title' ;
-
-            // Remember previous state unless we've been redirected to login or we've just
-            // reset the state memory after logout. If we're redirected to login, our
-            // previousState is already set in the authExpiredInterceptor. If we're going
-            // to login directly, we don't want to be sent to some previous state anyway
-            if (toState.name != 'login' && localStorageService.get('previousStateName')) {
-              // localStorageService.set('previousStateName',fromState.name);
-              // localStorageService.set('previousStateParams',fromParams);
-              // $rootScope.previousStateName = fromState.name;
-              // $rootScope.previousStateParams = fromParams;
-            }
 
             // Set the page title key to the one configured in state or use default one
             if (toState.data.pageTitle) {
